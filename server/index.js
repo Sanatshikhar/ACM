@@ -11,10 +11,23 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
 // ─── Google Sheets Auth ────────────────────────────────────────
-const auth = new google.auth.GoogleAuth({
-  keyFile: path.join(__dirname, "credentials.json"),
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-});
+let auth;
+if (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+  // Use environment variables (for Render / production)
+  auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    },
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+} else {
+  // Fall back to credentials.json (local development)
+  auth = new google.auth.GoogleAuth({
+    keyFile: path.join(__dirname, "credentials.json"),
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+}
 
 const sheets = google.sheets({ version: "v4", auth });
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
@@ -148,6 +161,6 @@ app.get("/api/stats", async (req, res) => {
 });
 
 // ─── Start Server ─────────────────────────────────────────────
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Gate Pass Server running on http://localhost:${PORT}`);
 });
