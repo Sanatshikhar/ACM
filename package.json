@@ -1,0 +1,13 @@
+{
+  "name": "gate-pass-app",
+  "version": "1.0.0",
+  "description": "Gate Pass Scanner - Event Check-in System with Google Sheets",
+  "scripts": {
+    "server": "cd server && node index.js",
+    "client": "cd client && npm start",
+    "dev": "start cmd /c \"cd server && node index.js\" && cd client && npm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
